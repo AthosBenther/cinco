@@ -101,6 +101,7 @@
         });
         document.getElementById('btnA').addEventListener('pointerup', function(e) {
             pressedA = false;
+            updateResult();
         });
         document.getElementById('btnB').addEventListener('pointerdown', function(e) {
             pressedB = true;
@@ -108,6 +109,7 @@
         });
         document.getElementById('btnB').addEventListener('pointerup', function(e) {
             pressedB = false;
+            updateResult();
         });
     </script>
 </body>
