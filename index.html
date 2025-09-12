@@ -1,1 +1,114 @@
-<b>5</b>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Button Sum Proof of Concept</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f9f9f9;
+        }
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 32px 16px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .inputs {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        input[type="number"] {
+            width: 120px;
+            padding: 18px;
+            margin: 0;
+            font-size: 1.5em;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            text-align: center;
+            outline: none;
+            transition: border 0.2s;
+        }
+        input[type="number"]:focus {
+            border: 1.5px solid #0078d4;
+        }
+        .buttons {
+            display: flex;
+            gap: 32px;
+            margin-bottom: 32px;
+        }
+        button {
+            padding: 22px 44px;
+            font-size: 1.5em;
+            border: none;
+            border-radius: 12px;
+            background: #0078d4;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            touch-action: manipulation;
+        }
+        button:active {
+            background: #005fa3;
+            transform: scale(0.97);
+        }
+        .result {
+            margin-top: 16px;
+            font-size: 2em;
+            color: #333;
+            min-height: 2em;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="inputs">
+            <input type="number" id="inputA" placeholder="Number A" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+            <input type="number" id="inputB" placeholder="Number B" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+        </div>
+        <div class="buttons">
+            <button id="btnA">A</button>
+            <button id="btnB">B</button>
+        </div>
+        <div class="result" id="result"></div>
+    </div>
+    <script>
+        let pressedA = false;
+        let pressedB = false;
+
+        function updateResult() {
+            const valA = parseFloat(document.getElementById('inputA').value) || 0;
+            const valB = parseFloat(document.getElementById('inputB').value) || 0;
+            let sum = 0;
+            if (pressedA) sum += valA;
+            if (pressedB) sum += valB;
+            document.getElementById('result').textContent = sum;
+        }
+
+        document.getElementById('btnA').addEventListener('pointerdown', function(e) {
+            pressedA = true;
+            updateResult();
+        });
+        document.getElementById('btnA').addEventListener('pointerup', function(e) {
+            pressedA = false;
+        });
+        document.getElementById('btnB').addEventListener('pointerdown', function(e) {
+            pressedB = true;
+            updateResult();
+        });
+        document.getElementById('btnB').addEventListener('pointerup', function(e) {
+            pressedB = false;
+        });
+    </script>
+</body>
+</html>
