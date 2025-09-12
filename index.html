@@ -95,6 +95,25 @@
             document.getElementById('result').textContent = sum;
         }
 
+        // Touch events for mobile
+        document.getElementById('btnA').addEventListener('touchstart', function(e) {
+            pressedA = true;
+            updateResult();
+        });
+        document.getElementById('btnA').addEventListener('touchend', function(e) {
+            pressedA = false;
+            updateResult();
+        });
+        document.getElementById('btnB').addEventListener('touchstart', function(e) {
+            pressedB = true;
+            updateResult();
+        });
+        document.getElementById('btnB').addEventListener('touchend', function(e) {
+            pressedB = false;
+            updateResult();
+        });
+
+        // Pointer events for desktop fallback
         document.getElementById('btnA').addEventListener('pointerdown', function(e) {
             pressedA = true;
             updateResult();
