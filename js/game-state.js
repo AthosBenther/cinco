@@ -7,7 +7,9 @@ import {
 } from './constants.js';
 
 export class GameState {
-  constructor() {
+  constructor(opts = {}) {
+    this.debug = !!opts.debug;
+    this.fightMode = !!opts.fight;
     this.players = { 1: new Player(1, this), 2: new Player(2, this) };
     this.roundNumber = 1;
     this.pendingHits = [];
@@ -22,8 +24,30 @@ export class GameState {
 
     this.detectOrientation();
     window.addEventListener('resize', () => this.detectOrientation());
-    this.showMainMenu();
+    if (this.fightMode) {
+      // Skip menu/ready/countdown, start fight with 1000 HP
+      this.roundNumber = 1;
+      this.players[1].roundWins = 0;
+      this.players[2].roundWins = 0;
+      this.players[1].setHP(1000);
+      this.players[2].setHP(1000);
+      this.matchEnded = false;
+      this.overlay.classList.add('hidden');
+      this.roundActive = true;
+      this.players[1].updateUI();
+      this.players[2].updateUI();
+    } else {
+      this.showMainMenu();
+    }
     this.loop();
+  }
+
+  // Allow setting HP directly for fight mode
+  setPlayerHP(playerId, hp) {
+    if (this.players[playerId]) {
+      this.players[playerId].setHP(hp);
+      this.players[playerId].updateUI();
+    }
   }
 
   detectOrientation() {

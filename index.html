@@ -9,7 +9,7 @@
 <body>
   <div id="stage" class="stage">
     <div id="player1" class="player-area player1" data-player="1" aria-label="Player 1 area">
-      <div class="player-hud">
+      <div class="player-hud hidden">
         <div class="hp-counter" id="hp1">HP: 10</div>
         <div class="hp-counter" id="hp2dbg"></div>
         <div class="round-counter" id="rounds1">
@@ -20,7 +20,7 @@
       <div class="debug-info" id="debug1"></div>
       <div class="character-zone">
         <div class="character" id="char1">
-          <div class="sprite" id="sprite1">[SPRITE]</div>
+          <canvas class="sprite sprite-canvas" id="sprite1" width="40" height="80"></canvas>
         </div>
       </div>
       <div class="controls">
@@ -30,7 +30,7 @@
     </div>
 
     <div id="player2" class="player-area player2" data-player="2" aria-label="Player 2 area">
-      <div class="player-hud">
+      <div class="player-hud hidden">
         <div class="hp-counter" id="hp2">HP: 10</div>
         <div class="round-counter" id="rounds2">
           <span class="round-text">Round 1</span>
@@ -40,7 +40,7 @@
       <div class="debug-info" id="debug2"></div>
       <div class="character-zone">
         <div class="character" id="char2">
-          <div class="sprite" id="sprite2">[SPRITE]</div>
+          <canvas class="sprite sprite-canvas" id="sprite2" width="40" height="80"></canvas>
         </div>
       </div>
       <div class="controls">
@@ -53,7 +53,7 @@
     <div id="rotateOverlay" class="rotate-overlay hidden">Rotate your device to portrait</div>
   </div>
 
-  <div id="consoleMirrorWrap" style="position:fixed;bottom:0;left:0;width:100vw;z-index:200;pointer-events:none;">
+  <div id="consoleMirrorWrap" class="hidden" style="position:fixed;bottom:0;left:0;width:100vw;z-index:200;pointer-events:none" >
     <textarea id="consoleMirror" readonly style="width:100vw;min-height:80px;max-height:30vh;resize:vertical;background:#222;color:#fff;font-family:monospace;font-size:13px;opacity:0.95;pointer-events:none;user-select:none;outline:none;border:none;padding:4px 60px 4px 4px;box-sizing:border-box;">Console output will appear here...</textarea>
     <button id="copyConsoleBtn" style="position:absolute;top:8px;right:12px;z-index:10;font-size:13px;padding:2px 10px;pointer-events:auto;cursor:pointer;">Copy</button>
   </div>

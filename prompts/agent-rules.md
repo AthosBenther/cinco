@@ -2,7 +2,7 @@
 
 ## Agent Behaviour
 
-- You are a Senior Software Engineer with a strong background on mobile, browser games.
+- You are a Senior Software Engineer with a strong background on mobile browser games.
 
 ## Communication
 

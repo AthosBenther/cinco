@@ -13,6 +13,12 @@ export class Player {
     this.id = id;
     this.gameState = gameState;
     this.hp = HP_MAX;
+    // Hide debug UI if not in debug mode
+    if (!window.__DEBUG_ENABLED) {
+      if (this.debugEl) this.debugEl.style.display = 'none';
+      if (this.hp2DbgEl) this.hp2DbgEl.style.display = 'none';
+      if (this.hpEl && this.id === 1) this.hpEl.style.display = 'none';
+    }
     this.roundWins = 0;
     this.bodyState = 'default';
     this.headState = 'default';
@@ -21,7 +27,11 @@ export class Player {
     this.isAttacking = false;
     this._hitTimer = null;
 
-    this.spriteEl = document.getElementById(`sprite${id}`);
+    this.spriteCanvas = document.getElementById(`sprite${id}`);
+    this.spriteCtx = this.spriteCanvas.getContext('2d');
+    this.spriteImg = new window.Image();
+    this.spriteImg.src = 'imgs/sprites/char.png';
+    this.spriteImg.onload = () => this.drawSprite();
     this.hpEl = document.getElementById(`hp${id}`);
     this.hp2DbgEl = document.getElementById('hp2dbg');
     this.roundsEl = document.getElementById(`rounds${id}`);
@@ -62,6 +72,12 @@ export class Player {
     });
 
     this.updateUI();
+    this.currentFrame = 0;
+  }
+
+  setHP(hp) {
+    this.hp = hp;
+    this.updateUI();
   }
 
   setBodyState(state) {
@@ -74,11 +90,8 @@ export class Player {
       this.bodyState = state;
       this.blocking = state === 'block';
     }
-    if (this.spriteEl) {
-      this.spriteEl.classList.remove('default', 'l_punch', 'r_punch', 'block', 'defeated');
-      this.spriteEl.classList.add(state);
-      if (state === 'default') this.spriteEl.textContent = '[SPRITE]';
-    }
+    this.currentFrame = 0;
+    this.drawSprite();
   }
 
   setVulnerable(value) {
@@ -87,12 +100,41 @@ export class Player {
 
   setHeadState(state) {
     this.headState = state;
-    if (this.spriteEl) {
-      if (state === 'hit') {
-        this.spriteEl.classList.add('hit');
-      } else {
-        this.spriteEl.classList.remove('hit');
-      }
+    // Optionally: add a hit effect overlay here if desired
+    this.drawSprite();
+  }
+  getSpriteFrameInfo() {
+    // Map body state to spritesheet column
+    const stateToCol = {
+      'default': 0,
+      'l_punch': 1,
+      'r_punch': 2,
+      'block': 3,
+      'defeated': 4
+    };
+    const col = stateToCol[this.bodyState] ?? 0;
+    // Only 1 frame per state for now (row 0)
+    const row = 0;
+    return { x: col * 10, y: row * 20, w: 10, h: 20 };
+  }
+
+  drawSprite() {
+    if (!this.spriteCanvas || !this.spriteCtx || !this.spriteImg.complete) return;
+    // Clear
+    this.spriteCtx.clearRect(0, 0, this.spriteCanvas.width, this.spriteCanvas.height);
+    // Scale up 4x (native 10x20 to 40x80)
+    const scale = 4;
+    const { x, y, w, h } = this.getSpriteFrameInfo();
+    this.spriteCtx.imageSmoothingEnabled = false;
+    this.spriteCtx.drawImage(this.spriteImg, x, y, w, h, 0, 0, w * scale, h * scale);
+    // Optionally: draw hit effect overlay
+    if (this.headState === 'hit') {
+      this.spriteCtx.save();
+      this.spriteCtx.globalCompositeOperation = 'source-atop';
+      this.spriteCtx.globalAlpha = 0.5;
+      this.spriteCtx.fillStyle = '#f00';
+      this.spriteCtx.fillRect(0, 0, w * scale, h * scale);
+      this.spriteCtx.restore();
     }
   }
 
@@ -171,15 +213,21 @@ export class Player {
 
   updateUI() {
     if (this.hpEl) {
-      this.hpEl.textContent = (DEBUG_SHOW_HP && this.id === 1) ? `HP: ${this.hp}` : '';
+      if (window.__DEBUG_ENABLED && this.id === 1) {
+        this.hpEl.style.display = '';
+        this.hpEl.textContent = `HP: ${this.hp}`;
+      } else {
+        this.hpEl.style.display = 'none';
+      }
     }
-    // Show P2 HP in Player 1 HUD for debug
-    if (this.hp2DbgEl && this.id === 2 && DEBUG_SHOW_HP) {
-      this.hp2DbgEl.textContent = `P2 HP: ${this.hp}`;
-    }
-    if (this.hp2DbgEl && this.id === 1) {
-      // Clear for P1 instance
-      this.hp2DbgEl.textContent = '';
+    if (this.hp2DbgEl) {
+      if (window.__DEBUG_ENABLED && this.id === 2) {
+        this.hp2DbgEl.style.display = '';
+        this.hp2DbgEl.textContent = `P2 HP: ${this.hp}`;
+      } else {
+        this.hp2DbgEl.style.display = 'none';
+        if (this.id === 1) this.hp2DbgEl.textContent = '';
+      }
     }
     if (this.roundTextEl) {
       this.roundTextEl.textContent = `Round ${this.gameState.roundNumber}`;
@@ -193,7 +241,13 @@ export class Player {
       }
     }
     if (this.debugEl) {
-      this.debugEl.textContent = `State: ${this.bodyState} | Head: ${this.headState} | Vuln: ${this.vulnerable} | Block: ${this.blocking} | Att: ${this.isAttacking}`;
+      if (window.__DEBUG_ENABLED) {
+        this.debugEl.style.display = '';
+        this.debugEl.textContent = `State: ${this.bodyState} | Head: ${this.headState} | Vuln: ${this.vulnerable} | Block: ${this.blocking} | Att: ${this.isAttacking}`;
+      } else {
+        this.debugEl.style.display = 'none';
+      }
     }
+    this.drawSprite();
   }
 }

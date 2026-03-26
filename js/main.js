@@ -1,4 +1,15 @@
+
 import { GameState } from './game-state.js';
+
+// Parse URL params
+function getUrlParams() {
+  const params = {};
+  window.location.search.replace(/[?&]([^=]+)=([^&]*)/g, (_, k, v) => { params[k] = v; });
+  return params;
+}
+const urlParams = getUrlParams();
+window.__DEBUG_ENABLED = urlParams.debug === 'true';
+window.__FIGHT_MODE = urlParams.fight === 'true';
 
 
 // Track which keys are down to avoid duplicate pointerdown events
@@ -23,7 +34,7 @@ function simulateButtonUp(player, action) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  new GameState();
+  new GameState({ debug: window.__DEBUG_ENABLED, fight: window.__FIGHT_MODE });
   window.addEventListener('keydown', (e) => {
     const key = e.key.toLowerCase();
     if (e.repeat || !(key in keyToBtn)) return;

@@ -6,8 +6,8 @@ export const PUNCH_PHASE = {
   CONNECT: 0.5,
   RECOVER: 0.7,
 };
-export const LEFT_PUNCH_DURATION_MS = 250;
-export const RIGHT_PUNCH_DURATION_MS = 500;
+export const LEFT_PUNCH_DURATION_MS = 100;
+export const RIGHT_PUNCH_DURATION_MS = 200;
 export const RIGHT_PUNCH_MULTIPLIER = 2;
 export const HP_MAX = 10;
 export const HIT_STATE_DURATION_MS = 300;
