@@ -23,7 +23,11 @@ export class Player {
 
     this.spriteEl = document.getElementById(`sprite${id}`);
     this.hpEl = document.getElementById(`hp${id}`);
+    this.hp2DbgEl = document.getElementById('hp2dbg');
     this.roundsEl = document.getElementById(`rounds${id}`);
+    this.debugEl = document.getElementById(`debug${id}`);
+    this.flagsEl = document.getElementById(`flags${id}`);
+    this.roundTextEl = this.roundsEl.querySelector('.round-text');
 
     this.leftPunchAnim = new Anim({
       durationMs: LEFT_PUNCH_DURATION_MS,
@@ -61,9 +65,15 @@ export class Player {
   }
 
   setBodyState(state) {
-    this.bodyState = state;
-    this.blocking = state === 'block';
-
+    if (this.bodyState !== state) {
+      const prev = this.bodyState;
+      this.bodyState = state;
+      this.blocking = state === 'block';
+      console.log(`Player ${this.id} state change: ${prev} → ${state}`);
+    } else {
+      this.bodyState = state;
+      this.blocking = state === 'block';
+    }
     if (this.spriteEl) {
       this.spriteEl.classList.remove('default', 'l_punch', 'r_punch', 'block', 'defeated');
       this.spriteEl.classList.add(state);
@@ -91,12 +101,15 @@ export class Player {
     this.gameState.queueHit({ attacker: this, punchType });
   }
 
-  applyDamage(amount) {
+  applyDamage(amount, reason = '') {
     if (this.hp <= 0) return;
+    const prevHp = this.hp;
     this.hp = Math.max(0, this.hp - amount);
+    let msg = `Player ${this.id} HP: ${prevHp} → ${this.hp}`;
+    if (reason) msg += ` (${reason})`;
+    console.log(msg);
     this.updateUI();
     this.triggerHitReaction();
-
     if (this.hp === 0 && this.bodyState !== 'defeated') {
       this.setBodyState('defeated');
       this.gameState.onPlayerDefeated(this);
@@ -158,10 +171,29 @@ export class Player {
 
   updateUI() {
     if (this.hpEl) {
-      this.hpEl.textContent = DEBUG_SHOW_HP ? `HP: ${this.hp}` : '';
+      this.hpEl.textContent = (DEBUG_SHOW_HP && this.id === 1) ? `HP: ${this.hp}` : '';
     }
-    if (this.roundsEl) {
-      this.roundsEl.textContent = `Round ${this.gameState.roundNumber} | Wins: ${this.roundWins}`;
+    // Show P2 HP in Player 1 HUD for debug
+    if (this.hp2DbgEl && this.id === 2 && DEBUG_SHOW_HP) {
+      this.hp2DbgEl.textContent = `P2 HP: ${this.hp}`;
+    }
+    if (this.hp2DbgEl && this.id === 1) {
+      // Clear for P1 instance
+      this.hp2DbgEl.textContent = '';
+    }
+    if (this.roundTextEl) {
+      this.roundTextEl.textContent = `Round ${this.gameState.roundNumber}`;
+    }
+    if (this.flagsEl) {
+      this.flagsEl.innerHTML = '';
+      for (let i = 0; i < this.roundWins; i++) {
+        const flag = document.createElement('div');
+        flag.className = 'flag';
+        this.flagsEl.appendChild(flag);
+      }
+    }
+    if (this.debugEl) {
+      this.debugEl.textContent = `State: ${this.bodyState} | Head: ${this.headState} | Vuln: ${this.vulnerable} | Block: ${this.blocking} | Att: ${this.isAttacking}`;
     }
   }
 }

@@ -22,7 +22,7 @@ export class GameState {
 
     this.detectOrientation();
     window.addEventListener('resize', () => this.detectOrientation());
-    this.startMatch();
+    this.showMainMenu();
     this.loop();
   }
 
@@ -42,6 +42,28 @@ export class GameState {
     }
 
     this.loopId = requestAnimationFrame(() => this.loop());
+  }
+
+  showMainMenu() {
+    this.setOverlayHTML(`
+      <div class="overlay-content">
+        <div class="menu-title">Thumb Fighter</div>
+        <button class="menu-btn" id="fullscreenBtn">Enter Fullscreen</button>
+        <button class="menu-btn" id="startBtn">Start Game</button>
+      </div>
+    `);
+    this.overlay.classList.remove('hidden');
+
+    document.getElementById('fullscreenBtn').onclick = () => {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen();
+      }
+    };
+
+    document.getElementById('startBtn').onclick = () => {
+      this.overlay.classList.add('hidden');
+      this.startMatch();
+    };
   }
 
   startMatch() {
@@ -141,20 +163,25 @@ export class GameState {
     if (this.pendingHits.length === 0 || !this.roundActive) return;
 
     const hits = this.pendingHits.splice(0, this.pendingHits.length);
+
     const evaluations = hits.map((hit) => {
       const defender = hit.defender;
       let base = 2;
+      let reason = 'default';
       if (defender.bodyState === 'block') {
         base = 1;
+        reason = 'block';
       } else if (defender.vulnerable) {
         base = 3;
+        reason = 'vulnerable';
       }
       const damage = hit.punchType === 'right' ? base * RIGHT_PUNCH_MULTIPLIER : base;
-      return { hit, damage };
+      const punchType = hit.punchType;
+      return { hit, damage, reason: `${punchType} punch, ${reason}` };
     });
 
-    evaluations.forEach(({ hit, damage }) => {
-      hit.defender.applyDamage(damage);
+    evaluations.forEach(({ hit, damage, reason }) => {
+      hit.defender.applyDamage(damage, reason);
     });
 
     const p1Dead = this.players[1].hp <= 0;
@@ -213,13 +240,12 @@ export class GameState {
     this.setOverlayHTML(`
       <div class="overlay-content">
         <div class="match-result">PLAYER ${winner.id} WINS THE MATCH!</div>
-        <button class="ready-btn" id="matchRestart">Restart Match</button>
+        <button class="menu-btn" id="matchRestart">Play Again</button>
+        <button class="menu-btn" id="mainMenu">Main Menu</button>
       </div>
     `);
     this.overlay.classList.remove('hidden');
-    const restart = document.getElementById('matchRestart');
-    if (restart) {
-      restart.onclick = () => this.startMatch();
-    }
+    document.getElementById('matchRestart').onclick = () => this.startMatch();
+    document.getElementById('mainMenu').onclick = () => this.showMainMenu();
   }
 }

@@ -88,3 +88,4 @@ No movement. No special moves. No combos beyond the block mechanic.
 - Sprite placeholder is static; state changes only adjust CSS classes and colors.
 - Ready screen overlay split per player, with P2 rotated for their POV.
 - In-progress: right/left punch and block logic follow game-logic spec.
+- Debug console output area is present at the bottom of the screen, click-through except for its copy button. All `console.log` output is mirrored here and can be copied to clipboard.

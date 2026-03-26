@@ -73,6 +73,13 @@ Each player area spans exactly half the screen height and full screen width.
 
 All overlays use the shaded backdrop (`rgba(0,0,0,0.70)` + blur). The stage remains visible beneath.
 
+### Debug Console Output
+
+- A debug console output area is fixed at the bottom of the screen.
+- It is fully click-through except for its copy button (text selection is disabled).
+- All `console.log` output is mirrored here in real time.
+- A small button allows copying all output to the clipboard.
+
 ### Ready Screen (between rounds)
 
 - Shown after round end (or before round 1).
@@ -95,7 +102,7 @@ All overlays use the shaded backdrop (`rgba(0,0,0,0.70)` + blur). The stage rema
 - Displays match winner.
 - Option to restart match (returns to Round 1 Ready Screen, resets all state).
 
----
+----
 
 ## Layering Order (z-index, bottom to top)
 
@@ -104,3 +111,4 @@ All overlays use the shaded backdrop (`rgba(0,0,0,0.70)` + blur). The stage rema
 3. Debug HP counters
 4. Overlay backdrop (blur + black alpha)
 5. Overlay UI content (countdown, ready buttons, round/match results)
+6. Debug console output area (fixed at bottom, click-through except for copy/selection)
