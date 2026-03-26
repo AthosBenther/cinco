@@ -166,9 +166,11 @@ export class GameState {
 
     const evaluations = hits.map((hit) => {
       const defender = hit.defender;
+      // Defensive snapshot: check block state at hit time
+      const wasBlocking = defender.bodyState === 'block';
       let base = 2;
       let reason = 'default';
-      if (defender.bodyState === 'block') {
+      if (wasBlocking) {
         base = 1;
         reason = 'block';
       } else if (defender.vulnerable) {
@@ -177,11 +179,15 @@ export class GameState {
       }
       const damage = hit.punchType === 'right' ? base * RIGHT_PUNCH_MULTIPLIER : base;
       const punchType = hit.punchType;
-      return { hit, damage, reason: `${punchType} punch, ${reason}` };
+      return { hit, damage, reason: `${punchType} punch, ${reason}`, wasBlocking };
     });
 
-    evaluations.forEach(({ hit, damage, reason }) => {
+    evaluations.forEach(({ hit, damage, reason, wasBlocking }) => {
       hit.defender.applyDamage(damage, reason);
+      // If defender was blocking and took a hit, notify controls to suppress punch on release
+      if (wasBlocking && damage > 0) {
+        window.dispatchEvent(new CustomEvent('player-block-hit', { detail: { playerId: hit.defender.id } }));
+      }
     });
 
     const p1Dead = this.players[1].hp <= 0;
